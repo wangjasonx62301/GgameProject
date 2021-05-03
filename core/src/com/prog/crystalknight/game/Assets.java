@@ -10,7 +10,10 @@ import com.prog.crystalknight.util.Constants;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Assets implements Disposable, AssetErrorListener{
 	
@@ -31,6 +34,34 @@ public class Assets implements Disposable, AssetErrorListener{
 	public AssetRock rock;
 	public AssetCoin crystalCoin;
 	public AssetLevelDecoration levelDecoration;
+	
+	// Font
+	public AssetFonts fonts;
+	
+	public class AssetFonts{
+		public final BitmapFont defaultSmall;
+		public final BitmapFont defaultNormal;
+		public final BitmapFont defaultBig;
+		
+		public AssetFonts() {
+			// create font
+			defaultSmall = new BitmapFont(Gdx.files.internal("images/BebasNeue.fnt"), true);
+			defaultNormal = new BitmapFont(Gdx.files.internal("images/BebasNeue.fnt"), true);
+			defaultBig = new BitmapFont(Gdx.files.internal("images/BebasNeue.fnt"), true);
+			
+			// size
+			defaultSmall.getData().setScale(0.5f);
+			defaultNormal.getData().setScale(0.85f);
+			defaultBig.getData().setScale(2.0f);
+			
+			// set filter
+			defaultSmall.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+			defaultNormal.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+			defaultBig.getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+
+		}
+		
+	}
 	
 	
 	public void init(AssetManager assetManager) {
@@ -58,6 +89,11 @@ public class Assets implements Disposable, AssetErrorListener{
 		}
 		
 		// create objects
+		
+		// fonts
+		fonts = new AssetFonts();
+		
+		// objects
 		knight = new AssetKnight(atlas);
 		rock = new AssetRock(atlas);
 		crystalCoin = new AssetCoin(atlas);
@@ -68,6 +104,9 @@ public class Assets implements Disposable, AssetErrorListener{
 	@Override
 	public void dispose() {
 		assetManager.dispose();
+		fonts.defaultSmall.dispose();
+		fonts.defaultNormal.dispose();
+		fonts.defaultBig.dispose();
 	}
 	
 	// debugging
@@ -81,8 +120,23 @@ public class Assets implements Disposable, AssetErrorListener{
 	public class AssetKnight{
 		public final AtlasRegion knight;
 		
+		public final Animation<TextureRegion> anim_idle;
+		public final Animation<TextureRegion> anim_walk;
+		
 		public AssetKnight(TextureAtlas atlas) {
 			knight = atlas.findRegion("knight");
+			
+			Array<AtlasRegion> regions = null;
+			AtlasRegion region = null;
+			
+			// idle
+			regions = atlas.findRegions("idle");
+			anim_idle = new Animation<TextureRegion>(1.0f / 10.0f, regions, Animation.PlayMode.LOOP);
+		
+			// walking
+			regions = atlas.findRegions("anim_walk");
+			anim_walk = new Animation<TextureRegion>(1.0f / 10.0f, regions, Animation.PlayMode.LOOP);
+			
 		}
 	}
 
@@ -97,9 +151,18 @@ public class Assets implements Disposable, AssetErrorListener{
 	
 	public class AssetCoin{
 		public final AtlasRegion crystalCoin;
+		public final Animation<TextureRegion> anim_coin;
 		
 		public AssetCoin(TextureAtlas atlas) {
 			crystalCoin = atlas.findRegion("coin");
+			
+			// animation
+			Array<AtlasRegion> regions = atlas.findRegions("anim_coin");
+			AtlasRegion region = regions.first();
+			for(int i = 0; i < 10; i++) {
+				regions.insert(0, region);
+			}
+			anim_coin = new Animation<TextureRegion>(1.0f / 20.0f, regions, Animation.PlayMode.LOOP_PINGPONG);
 		}
 	}
 	

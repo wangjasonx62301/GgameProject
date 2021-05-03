@@ -9,9 +9,13 @@ import com.prog.crystalknight.game.objects.Clouds;
 import com.prog.crystalknight.game.objects.Mountains;
 import com.prog.crystalknight.game.objects.Rock;
 import com.prog.crystalknight.game.objects.WaterOverlay;
+import com.prog.crystalknight.game.objects.CrystalCoin;
+import com.prog.crystalknight.game.objects.Knight;
 
 public class Level {
 	public static final String TAG = Level.class.getName();
+	
+	
 	
 	public enum BLOCK_TYPE{
 		EMPTY(0, 0, 0), // black
@@ -37,6 +41,8 @@ public class Level {
 	
 	// object
 	public Array<Rock> rocks;
+	public Knight knight;
+	public Array<CrystalCoin> crystalCoins;
 	
 	// decoration
 	public Clouds clouds;
@@ -50,6 +56,9 @@ public class Level {
 	private void init(String filename) {
 		// objects
 		rocks = new Array<Rock>();
+		knight = null;
+		crystalCoins = new Array<CrystalCoin>();
+		
 		
 		// load image file
 		Pixmap pixmap = new Pixmap(Gdx.files.internal(filename));
@@ -88,11 +97,17 @@ public class Level {
 				}
 				// spawn point
 				else if (BLOCK_TYPE.PLAYER_SPAWNPOINT.sameColor(currentPixel)) {
-					
+					obj = new Knight();
+					offsetHeight = -3.0f;
+					obj.position.set(pixelX, baseHeight * obj.dimension.y + offsetHeight - 5.5f);
+					knight = (Knight)obj;
 				}
 				// crystal
 				else if (BLOCK_TYPE.ITEM_GOLD_COIN.sameColor(currentPixel)) {
-					
+					obj = new CrystalCoin();
+					offsetHeight = -1.5f;
+					obj.position.set(pixelX, baseHeight * obj.dimension.y + offsetHeight);
+					crystalCoins.add((CrystalCoin)obj);
 				}
 				// unknown objects
 				else {
@@ -135,5 +150,25 @@ public class Level {
 		// cloud
 		clouds.render(batch);
 		
+		// crystal
+		for(CrystalCoin crystalCoin : crystalCoins) {
+			crystalCoin.render(batch);
+		}
+		
+		// knight
+		knight.render(batch);
+		
 	}
+
+	public void update(float deltaTime) {
+		knight.update(deltaTime);
+		for(Rock rock : rocks) {
+			rock.update(deltaTime);
+		}
+		for(CrystalCoin crystalCoin : crystalCoins) {
+			crystalCoin.update(deltaTime);
+		}
+		clouds.update(deltaTime);
+	}
+
 }

@@ -22,4 +22,7 @@ public class Constants {
 	
 	// extra lives
 	public static final int LIVES_START = 3;
+	
+	// delay to game over
+	public static final float TIME_TO_GAMEOVER = 2.5f;
 }
